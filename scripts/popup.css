@@ -1,0 +1,206 @@
+
+body {
+    background: rgb(250,206,225);
+    background: radial-gradient(circle, rgba(250,206,225,1) 0%, rgba(154,200,255,1) 100%);    min-width: 350px;
+    padding: 0.5rem 1rem;
+    font-size: 14px;
+  }
+  h1 {
+    white-space: nowrap;
+  }
+  .disabled .wrapper {
+    pointer-events: none;
+    opacity: .5;
+  }
+
+  #en.disabled:before {
+    content: "We did not detect any video. If you think this is a mistake, try closing the popup and reopen it.";
+  }
+  .d-flex {
+    display: flex;
+  }
+  .d-inline-block {
+    display: inline-block;
+  }
+  .align-items-center {
+    align-items: center;
+  }
+  .justify-between {
+    justify-content: space-between;
+  }
+  .ml-1 {
+    margin-left: 0.3rem;
+  }
+  .mr-1 {
+    margin-right: 0.3rem;
+  }
+  .mr-2 {
+    margin-right: 0.7rem;
+  }
+  .mb-1 {
+    margin-bottom: 0.3rem;
+  }
+  .mb-2 {
+    margin-bottom: 1.5rem;
+  }
+  
+  .w-100 {
+    width: 100%;
+  }
+  .w-50 {
+    width: 50%;
+  }
+  
+  input {
+    outline: none;
+  }
+  
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 3.4rem;
+    height: 1.8rem;
+  }
+  .switch input {
+    display: none;
+  }
+  
+  .switch label {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: 0.4s;
+    transition: 0.4s;
+    border-radius: 1.8rem;
+  }
+  
+  .switch label:before {
+    position: absolute;
+    content: "";
+    height: 1.4rem;
+    width: 1.4rem;
+    left: 0.3rem;
+    top: 50%;
+    margin-top: -0.7rem;
+    border-radius: 50%;
+    background-color: white;
+    -webkit-transition: 0.4s;
+    transition: 0.4s;
+  }
+  
+  .switch input:checked + label {
+    background-color: #ea6341;
+  }
+  
+  .switch input:focus + label {
+    box-shadow: 0 0 1px #2196f3;
+  }
+  
+  .switch input:checked + label:before {
+    -webkit-transform: translateX(1.4rem);
+    -ms-transform: translateX(1.4rem);
+    -moz-transform: translateX(1.4rem);
+    transform: translateX(1.4rem);
+  }
+  
+  .reset img {
+    width: 20px;
+    height: 20px;
+  }
+  
+  datalist {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    height: auto;
+    bottom: 16px;
+    /* disable text selection */
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* IE10+/Edge */
+    user-select: none; /* Standard */
+    /* disable click events */
+    pointer-events: none;
+  }
+  datalist option {
+    width: 10px;
+    height: 10px;
+    min-height: 10px;
+    padding: 0;
+    line-height: 40px;
+    font-size: 90%;
+    color: #999;
+    text-align: center;
+  }
+  
+  button {
+    outline: none;
+    display: inline-block;
+    font-weight: bold;
+    font-size: 100%;
+    color: #fff;
+    background-color: #339af0;
+    position: relative;
+    padding: 0.75rem 0.5rem;
+    margin: 0 0.5rem;
+    width: 200px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.5s ease;
+  }
+  
+  button.pink {
+    background-color: #f783ac;
+  }
+  
+  .reset {
+    cursor: pointer;
+  }
+  
+  .support {
+    margin: 1rem 0;
+    border-top: 1px solid #efefef;
+    padding-top: 1rem;
+  }
+  
+  .support a {
+    text-align: center;
+    outline: none;
+    font-weight: bold;
+    font-size: 100%;
+    color: #fff;
+    background-color: #40c057;
+    padding: 0.75rem 0.5rem;
+    width: 100%;
+    border: none;
+    cursor: pointer;
+    display: block;
+    text-decoration: none;
+    transition: background-color 0.5s ease;
+  }
+  
+  .support a:hover {
+    background-color: #51cf66;
+  }
+  .transparent {
+    border: 1px solid #efefef;
+    outline: none;
+    border-radius: 5px;
+    transition: border .5s ease;
+    width: 2.4rem;
+    max-width: 50%;
+  }
+  
+  .transparent:hover,
+  .transparent:focus {
+    border-color: #ccc;
+  }
+  
+  .text-muted {
+    color: #bbb;
+  }
+  

@@ -1,15 +1,84 @@
 <!DOCTYPE html>
+<html lang="en">
+
 <head>
-    <title>Flip YouTube Video</title>
-    <style>
-        /* Add any styling you want here */
-        button {
-            margin: 10px;
-            padding: 5px 10px;
-        }
-    </style>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="popup.css" />
+    <script type = 'module' src="./popup.js"></script>
 </head>
+
 <body>
-    <button id="flipButton">Flip Video</button>
-    <script src="./popup.js"></script>
+    <header class="heading d-flex justify-between">
+        <!-- Title -->
+        <h1 id="title">Dance Practice for Youtube</h1>
+
+    </header>
+
+    <main class="wrapper">
+
+        <!-- Mirror -->
+        <div class="d-flex mb-2 justify-between align-items-center">
+            <div>
+                <b>Mirror</b>
+            </div>
+            <!-- Enable-->
+            <div class="d-flex align-items-center">
+                OFF
+                <div class="switch mr-1 ml-1">
+                    <input id="mirror" type="checkbox" />
+                    <label for="mirror">
+                    </label>
+                </div>
+                ON
+            </div>
+        </div>
+
+        <!-- Tempo -->
+        <div class>
+            <label class="label">
+                <div class="d-flex align-items-center justify-between">
+                    <div class="d-inline-block">
+                        <span class><b>Speed</b></span>
+                        <input id="tempo-value" class="transparent" value="1" />
+                    </div>
+                    <div id="reset-tempo" class="d-inline-block reset">
+                        <img src="../assets/marker.png" alt="reset" />
+                    </div>
+                </div>
+            </label>
+            <input class="w-100" id="tempo" type="range" min="0.5" max="4" step="0.01" value="1" list="tempo-ticks" />
+            <datalist id="tempo-ticks">
+                <option>0.5</option>
+                <option>1.0</option>
+                <option>1.5</option>
+                <option>2.0</option>
+                <option>2.5</option>
+                <option>3.0</option>
+            </datalist>
+        </div>
+
+        <!-- Repeat -->
+        <div class="mb-2">
+            <label class="label">
+                <div class="d-flex align-items-center justify-between mb-1">
+                    <div class="d-inline-block">
+                        <span><b>Segments</b></span>
+                    </div>
+                </div>
+            </label>
+            <div>
+
+            </div>
+
+        </div>
+
+        <div class="support">
+            <a href="https://ko-fi.com/axwdragon" target="_blank">
+                 Donate :D
+            </a>
+        </div>
+
+    </main>
 </body>
+
+</html>
