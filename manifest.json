@@ -12,7 +12,7 @@
     "icons": {
       "128": "icons/YDI.png"
     },
-    
+    "host_permissions": ["<all_urls>"],
     "permissions": [
       "activeTab",
       "scripting",

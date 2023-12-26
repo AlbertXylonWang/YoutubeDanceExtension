@@ -93,7 +93,7 @@ body {
   }
   
   .switch input:checked + label {
-    background-color: #ea6341;
+    background-color: #66cff3;
   }
   
   .switch input:focus + label {

@@ -1,40 +1,49 @@
 (() => {
-let youtubeLeftControls, youtubePlayer;
-let flipState;
-let currentVideo = "";
-let currentVideoMarkers = [];
-let markerStart = 0;
-let markerEnd = 0;
-let intervalId;
+  let youtubeRightControls, youtubePlayer;
+  var flipState;
+  var currentVideo = "";
+  let currentVideoMarkers = [];
+  let markerStart = 0;
+  let markerEnd = 0;
+  let intervalId;
+  var playbackR = 1;
 
-// FLIP VIDEO ----------------------------------------------------------------------
-function flipVideo() {
+
+  // FLIP VIDEO ----------------------------------------------------------------------
+  function flipVideo() {
     const video = document.querySelector('video');
     if (video) {
-       
+       console.log("currentVideo: "+currentVideo);
         const newState = !flipState;
         flipState = newState;
         applyFlip(video);
-        chrome.storage.sync.set({
+        chrome.storage.local.set({
             [currentVideo+"flip"]: flipState
           });
     }
 }
 function applyFlip(video){
-    if(flipState){
-        video.style.transform = 'scaleX(-1)';
-    }else{
-        video.style.transform = 'scaleX(1)';
-    }
+
+  video.style.transform = flipState ? 'scaleX(-1)' : 'scaleX(1)';
+
 }
-const fetchFlipState = async () => {
-  const flipState = await chrome.storage.sync.get(currentVideo+"flip");
-  return flipState[currentVideo+"flip"];
+const fetchFlipState = () => {
+  return new Promise((resolve, reject) => {
+      chrome.storage.local.get([currentVideo + "flip"], (result) => {
+          if (chrome.runtime.lastError) {
+              reject(chrome.runtime.lastError);
+          } else {
+              resolve(result[currentVideo + "flip"]);
+          }
+      });
+  });
 };
 
+
 const observer = new MutationObserver(mutations => {
+  
   mutations.forEach(mutation => {
-      if (mutation.target.nodeName === 'video') {
+      if (mutation.target.tagName === 'VIDEO') {
           applyFlip(mutation.target);
       }
   });
@@ -52,17 +61,45 @@ const observerConfig = {
 function startObserver() {
   const video = document.querySelector('video');
   if (video) {
+      console.log("observer started");
       observer.observe(document.body, observerConfig);
       applyFlip(video);
   }
 }
 
 function stopObserver() {
+  console.log("observer stopped");
   observer.disconnect();
 }
 
 //Tempo ---------------------------------------------------------------
 
+
+
+const fetchPlaybackRate = () => {
+  return new Promise((resolve, reject) => {
+      chrome.storage.local.get([currentVideo + "playbackRate"], (result) => {
+          if (chrome.runtime.lastError) {
+              reject(chrome.runtime.lastError);
+          } else {
+              resolve(result[currentVideo + "playbackRate"] || 1);
+          }
+      });
+  });
+};
+
+function changePlaybackRate(rate){
+  playbackR = rate;
+
+  const video = document.querySelector('video');
+  if (video) {
+    video.playbackRate = rate;
+  }
+
+  chrome.storage.local.set({
+    [currentVideo+"playbackRate"]: rate
+  });
+}
 // Markers ----------------------------------------------------------------------
 
 const addNewMarkerEventHandler = async () => {
@@ -73,15 +110,15 @@ const addNewMarkerEventHandler = async () => {
     };
 
     currentVideoMarkers = await fetchMarkers();
-
-    chrome.storage.sync.set({
-      [currentVideo+"markers"]: JSON.stringify([...currentVideoMarkers, newMarker].sort((a, b) => a.time - b.time))
-    });
+    console.log('BUTTON DETECTED');
+    // chrome.storage.local.set({
+    //   [currentVideo+"markers"]: JSON.stringify([...currentVideoMarkers, newMarker].sort((a, b) => a.time - b.time))
+    // });
   };
 
 
   const fetchMarkers = async () => {
-    const markers = await chrome.storage.sync.get(currentVideo+"markers");
+    const markers = await chrome.storage.local.get(currentVideo+"markers");
     return JSON.parse(markers[currentVideo+"markers"]);
   };
   
@@ -92,10 +129,14 @@ const addNewMarkerEventHandler = async () => {
 // ON LOAD----------------------------------------------------------------------
 const newVideoLoaded = async () => {
     
-    const markerBtnExists = document.getElementsByClassName("marker-btn")[0];
-
-    currentVideoMarkers = await fetchMarkers();
+    const markerBtnExists = document.getElementsByClassName("ytp-button marker-btn")[0];
+    //  currentVideoMarkers = await fetchMarkers();
     flipState = await fetchFlipState();
+    playbackR = await fetchPlaybackRate();
+    console.log("new video loaded running\nflipState: "+flipState+"\nplaybackRate: "+playbackR+"\n")
+    applyFlip(document.querySelector('video'));
+
+    console.log('stored properties applied');
     if (!markerBtnExists) {
       const markerBtn = document.createElement("img");
 
@@ -103,10 +144,11 @@ const newVideoLoaded = async () => {
       markerBtn.className = "ytp-button " + "marker-btn";
       markerBtn.title = "Click to mark the current timestamp";
 
-      youtubeLeftControls = document.getElementsByClassName("ytp-left-controls")[0];
+      console.log('marker button created');
+      youtubeRightControls = document.getElementsByClassName("ytp-right-controls")[0];
       youtubePlayer = document.getElementsByClassName('video-stream')[0];
 
-      youtubeLeftControls.appendChild(markerBtn);
+      youtubeRightControls.prepend(youtubeRightControls.firstChild, markerBtn);
       markerBtn.addEventListener("click", addNewMarkerEventHandler);
     }
 
@@ -118,9 +160,19 @@ const newVideoLoaded = async () => {
 // Listen for messages from either the popup or background script
 chrome.runtime.onMessage.addListener(
     function(request, sender, sendResponse) {
+      if(currentVideo == ""){
+        //forces loading operations if the background script doesn't detect it
+        currentVideo = request.videoID;
+        newVideoLoaded();
+        startObserver();
+      }
+      console.log("message received: " + request.action);
         if (request.action === "flipVideo") {
             flipVideo();
-        }else if(request.action === "NEW_VIDEO"){
+        }else if(request.action === "changePlaybackRate"){
+          changePlaybackRate(request.rate);
+        
+      } else if(request.action === "NEW_VIDEO"){
             currentVideo = request.videoId;
             newVideoLoaded();
             startObserver();
@@ -133,7 +185,7 @@ window.addEventListener('beforeunload', () => {
     if (intervalId) {
         clearInterval(intervalId);
     }
+    console.log("page unloaded");
     stopObserver();
 });
-
 })();
