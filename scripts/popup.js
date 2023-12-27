@@ -144,6 +144,9 @@ document.addEventListener("DOMContentLoaded", async () => {
           const markerElement = document.getElementById(
             "marker-" + markerStart
           );
+          if(markerElement == undefined){
+            return;
+          }
           markerElement.getElementsByClassName("marker-control:begin")[0].classList.add('highlight');
         }
       });
@@ -153,6 +156,9 @@ document.addEventListener("DOMContentLoaded", async () => {
           const markerElement = document.getElementById(
             "marker-" + markerEnd
           );
+          if(markerElement == undefined){
+            return;
+          }
           markerElement.getElementsByClassName("marker-control:end")[0].classList.add('highlight');
         }
       });
