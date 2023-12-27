@@ -81,7 +81,7 @@ const onDelete = async e => {
 }
 
 function clearHighlights(iconClass){
-  console.log("clearing highlights");
+  
   // Select all images
   const images = document.getElementsByClassName(iconClass);
 

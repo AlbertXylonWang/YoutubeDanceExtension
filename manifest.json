@@ -12,10 +12,9 @@
     "icons": {
       "128": "icons/YDI.png"
     },
-    "host_permissions": ["<all_urls>"],
+    "host_permissions": ["https://youtube.com/*"],
     "permissions": [
       "activeTab",
-      "scripting",
       "storage"
     ],
     "web_accessible_resources": [{
