@@ -1,8 +1,8 @@
 
 body {
-    background: rgb(250,206,225);
-    background: radial-gradient(circle, rgba(250,206,225,1) 0%, rgba(154,200,255,1) 100%);    min-width: 350px;
-    padding: 0.5rem 1rem;
+    background-color: #bbff99;
+    background-image: linear-gradient(319deg, #bbff99 0%, #ffec99 37%, #ff9999 100%);
+      padding: 0.5rem 1rem;
     font-size: 14px;
   }
   h1 {
@@ -13,9 +13,7 @@ body {
     opacity: .5;
   }
 
-  #en.disabled:before {
-    content: "We did not detect any video. If you think this is a mistake, try closing the popup and reopen it.";
-  }
+
   .d-flex {
     display: flex;
   }
@@ -24,6 +22,9 @@ body {
   }
   .align-items-center {
     align-items: center;
+  }
+  .text-right{
+    position: relative;
   }
   .justify-between {
     justify-content: space-between;
@@ -50,9 +51,12 @@ body {
   .w-50 {
     width: 50%;
   }
-  
+  .credits{
+    font-size: 4px
+  }
   input {
     outline: none;
+    background-color: rgb(179, 212, 253);
   }
   
   .switch {
@@ -72,7 +76,7 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: #ccc;
+    background-color: rgba(154,200,255,1);
     -webkit-transition: 0.4s;
     transition: 0.4s;
     border-radius: 1.8rem;
@@ -93,12 +97,13 @@ body {
   }
   
   .switch input:checked + label {
-    background-color: #66cff3;
+    background-color: #77ff99;
   }
   
   .switch input:focus + label {
     box-shadow: 0 0 1px #2196f3;
   }
+  
   
   .switch input:checked + label:before {
     -webkit-transform: translateX(1.4rem);
@@ -111,6 +116,28 @@ body {
     width: 20px;
     height: 20px;
   }
+  /* Styles for the track */
+  input[type=range]::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 8px;
+    background: rgb(179, 212, 253); /* Track color */
+    border-radius: 5px;
+  }
+
+  input[type=range]::-moz-range-track {
+    width: 100%;
+    height: 8px;
+    background: rgb(179, 212, 253); /* Track color */
+    border-radius: 5px;
+  }
+  input[type=range]::-ms-track {
+    width: 100%;
+    height: 8px;
+    background: rgb(179, 212, 253); /* Track color */
+    border-radius: 5px;
+  }
+
+
   
   datalist {
     position: relative;
@@ -118,6 +145,9 @@ body {
     justify-content: space-between;
     height: auto;
     bottom: 16px;
+    
+    color: rgb(154, 200,255);
+    
     /* disable text selection */
     -webkit-user-select: none; /* Safari */
     -moz-user-select: none; /* Firefox */
@@ -133,7 +163,7 @@ body {
     padding: 0;
     line-height: 40px;
     font-size: 90%;
-    color: #999;
+    color: black;
     text-align: center;
   }
   
@@ -153,14 +183,15 @@ body {
     transition: background-color 0.5s ease;
   }
   
-  button.pink {
-    background-color: #f783ac;
-  }
   
   .reset {
     cursor: pointer;
   }
   
+  .blue-input{
+    background-color: #339af0;
+    color: #339af0;
+  }
   .support {
     margin: 1rem 0;
     border-top: 1px solid #efefef;
@@ -183,11 +214,12 @@ body {
     transition: background-color 0.5s ease;
   }
   
+
   .support a:hover {
-    background-color: #51cf66;
+    background-color: #50d068;
   }
   .transparent {
-    border: 1px solid #efefef;
+    border: 1px solid #eeeeee;
     outline: none;
     border-radius: 5px;
     transition: border .5s ease;

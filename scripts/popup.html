@@ -39,11 +39,11 @@
                 <div class="d-flex align-items-center justify-between">
                     <div class="d-inline-block">
                         <span class><b>Speed</b></span>
-                        <input id="tempo-value" class="d-inline-block transparent" value="1" />
                     </div>
+                        <input id="tempo-value" class="mr-1 transparent" value="1" />
                 </div>
             </label>
-            <input class="w-100" id="tempo" type="range" min="0.1" max="3" step="0.01" value="1" list="tempo-ticks" />
+            <input class="w-100 blue-input" id="tempo" type="range" min="0.1" max="3" step="0.01" value="1" list="tempo-ticks" />
             <datalist id="tempo-ticks">
                 <option>0.1</option>
                 <option>0.5</option>
@@ -59,10 +59,9 @@
         <div class="mb-2">
             <label class="label">
                 <div class="d-flex align-items-center justify-between mb-1">
-                    <div class="d-inline-block">
-                        <span><b>Segments</b></span>
-                    </div>
+                    <div><b>Markers</b></div>
                 </div>
+                <div class = "markers" id = "markers"></div>
             </label>
             <div>
 
@@ -74,6 +73,9 @@
             <a href="https://ko-fi.com/axwdragon" target="_blank">
                  Donate :D
             </a>
+        </div>
+        <div class = "credits">
+            marker icon by icons8
         </div>
 
     </main>

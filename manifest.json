@@ -21,14 +21,13 @@
     "web_accessible_resources": [{
 
       "resources" : [
-        "assets/marker.png"
+        "assets/marker.png",
+        "assets/icons8-crayon-48.png"
       ],
       "matches": ["https://*.youtube.com/*"]
       }
     ],
-    "background": {
-      "service_worker": "scripts/background.js"
-    },
+
     "content_scripts": [
         {
           "matches": ["*://*.youtube.com/*"],
