@@ -55,8 +55,6 @@ const setMarkerEnd = async e => {
   const activeTab = await getActiveTabURL();
   const markerTime = e.target.parentNode.parentNode.getAttribute("timestamp");
 
-  console.log("parent Node: "+e.target.parentNode);
-  console.log("parent element: "+e.target.parentElement);
   clearHighlights('marker-control:end');
     // Add highlight to the clicked image's parent
   e.target.classList.add('highlight');
@@ -71,12 +69,9 @@ const onDelete = async e => {
   const activeTab = await getActiveTabURL();
 
   const markerTime = e.target.parentNode.parentNode.getAttribute("timestamp");
-  console.log("deleting marker at: "+markerTime)
   const markerElementToDelete = document.getElementById(
     "marker-" + markerTime
   );
-  console.log("marker element to delete: "+markerElementToDelete);
-  console.log("parent node: "+markerElementToDelete.parentNode);
   markerElementToDelete.parentNode.removeChild(markerElementToDelete);
   chrome.tabs.sendMessage(activeTab.id, {
     action: "deleteMarker",
@@ -143,6 +138,24 @@ document.addEventListener("DOMContentLoaded", async () => {
         document.getElementById('mirror').checked = flipState;
       });
       
+      chrome.storage.local.get([currentVideo+"markerStart"], (data) => {
+        const markerStart = data[currentVideo+"markerStart"];
+        if(markerStart != 0){
+          const markerElement = document.getElementById(
+            "marker-" + markerStart
+          );
+          markerElement.getElementsByClassName("marker-control:begin")[0].classList.add('highlight');
+        }
+      });
+      chrome.storage.local.get([currentVideo+"markerEnd"], (data) => {
+        const markerEnd = data[currentVideo+"markerEnd"];
+        if(markerEnd != 0 || markerEnd != undefined){
+          const markerElement = document.getElementById(
+            "marker-" + markerEnd
+          );
+          markerElement.getElementsByClassName("marker-control:end")[0].classList.add('highlight');
+        }
+      });
       //BUTTON HANDLING ----------------------------------------------------------
       document.getElementById('mirror').addEventListener('change', function() {
         chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {

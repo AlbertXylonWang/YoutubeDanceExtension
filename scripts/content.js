@@ -127,6 +127,22 @@ const addNewMarkerEventHandler = async () => {
     });
   };
   
+  const fetchMarkerStart = () => {
+    return new Promise((resolve) => {
+      chrome.storage.local.get([currentVideo+"markerStart"], (obj) => {
+        resolve(obj[currentVideo+"markerStart"] ? obj[currentVideo+"markerStart"] : 0);
+      });
+    });
+  };
+  const fetchMarkerEnd = () => {
+    return new Promise((resolve) => {
+      chrome.storage.local.get([currentVideo+"markerEnd"], (obj) => {
+        resolve(obj[currentVideo+"markerEnd"] ? obj[currentVideo+"markerEnd"] : 0);
+      }
+      );
+    });
+  };
+
 // LOOP SEGMENT ----------------------------------------------------------------
 
 function checkLoop(){
@@ -155,6 +171,8 @@ const newVideoLoaded = async () => {
     currentVideoMarkers = await fetchMarkers();
     flipState = await fetchFlipState();
     playbackR = await fetchPlaybackRate();
+    markerEnd = await fetchMarkerEnd();
+    markerStart = await fetchMarkerStart();
     applyFlip(document.querySelector('video'));
     changePlaybackRate(playbackR);
     
@@ -197,14 +215,25 @@ chrome.runtime.onMessage.addListener(
           response(currentVideoMarkers)
         }else if(request.action === "setMarkerStart"){
           markerStart = request.time;
+
           checkLoop();
+
+          chrome.storage.local.set({
+            [currentVideo+"markerStart"]: markerStart
+          });
         }else if(request.action === "setMarkerEnd"){
           markerEnd = request.time;
           checkLoop();
+          
+          chrome.storage.local.set({
+            [currentVideo+"markerEnd"]: markerEnd
+          });
         }else if(request.action === "clearMarkers"){
           markerStart = 0;
           markerEnd = 0;
           clearInterval(intervalId);
+          chrome.storage.local.remove([currentVideo+"markerStart"]);
+          chrome.storage.local.remove([currentVideo+"markerEnd"]);
         }
     }
 );
