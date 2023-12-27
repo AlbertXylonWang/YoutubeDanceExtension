@@ -9,8 +9,8 @@ const addNewMarker = (markers, marker) =>{
   markerTItleElement.className = "marker-title";
   controlsElement.className = "marker-controls";
 
-  setMarkerAttributes("begin", setBegin, controlsElement);
-  setMarkerAttributes("end", setEnd, controlsElement);
+  setMarkerAttributes("begin", setMarkerStart, controlsElement);
+  setMarkerAttributes("end", setMarkerEnd, controlsElement);
   setMarkerAttributes("delete", onDelete, controlsElement);
 
   newMarkerElement.id = "marker-" + marker.time;
@@ -38,17 +38,77 @@ const viewMarkers = (currentMarkers=[]) => {
   return;
 };
 
+const setMarkerStart = async e => {
+  const activeTab = await getActiveTabURL();
+  const markerTime = e.target.parentNode.parentNode.getAttribute("timestamp");
+
+  clearHighlights('marker-control:begin');
+  // Add highlight to the clicked image's parent
+  e.target.classList.add('highlight');
+
+  chrome.tabs.sendMessage(activeTab.id, {
+    action: "setMarkerStart",
+    time: markerTime,
+  });
+}
+const setMarkerEnd = async e => {
+  const activeTab = await getActiveTabURL();
+  const markerTime = e.target.parentNode.parentNode.getAttribute("timestamp");
+
+  console.log("parent Node: "+e.target.parentNode);
+  console.log("parent element: "+e.target.parentElement);
+  clearHighlights('marker-control:end');
+    // Add highlight to the clicked image's parent
+  e.target.classList.add('highlight');
+
+
+  chrome.tabs.sendMessage(activeTab.id, {
+    action: "setMarkerEnd",
+    time: markerTime,
+  });
+}
+const onDelete = async e => {
+  const activeTab = await getActiveTabURL();
+
+  const markerTime = e.target.parentNode.parentNode.getAttribute("timestamp");
+  console.log("deleting marker at: "+markerTime)
+  const markerElementToDelete = document.getElementById(
+    "marker-" + markerTime
+  );
+  console.log("marker element to delete: "+markerElementToDelete);
+  console.log("parent node: "+markerElementToDelete.parentNode);
+  markerElementToDelete.parentNode.removeChild(markerElementToDelete);
+  chrome.tabs.sendMessage(activeTab.id, {
+    action: "deleteMarker",
+    time: markerTime,
+  });
+
+}
+
+function clearHighlights(iconClass){
+  console.log("clearing highlights");
+  // Select all images
+  const images = document.getElementsByClassName(iconClass);
+
+  Array.from(images).forEach(img => {
+    // Remove highlight from all images of the same class
+    img.classList.remove('highlight');
+  });
+
+}
+
 const setMarkerAttributes = (src, handler, controlsElement) => {
   const markerControlElement = document.createElement("img");
-
-  markerControlElement.src = "assets/" + src + ".png";
+  markerControlElement.className = "marker-control:"+src;
+  markerControlElement.src = chrome.runtime.getURL("assets/" + src + ".png");
   markerControlElement.title = src;
   markerControlElement.addEventListener("click", handler);
   controlsElement.appendChild(markerControlElement);
 }
 
 
-
+  
+//ON CLICKING POPUP
 document.addEventListener("DOMContentLoaded", async () => {
     const activeTab = await getActiveTabURL();
     if (activeTab.url == undefined) {
@@ -60,8 +120,20 @@ document.addEventListener("DOMContentLoaded", async () => {
     const currentVideo = urlParameters.get("v");
   
     if (activeTab.url.includes("youtube.com/watch") && currentVideo) {
+      //STORAGE FETCHING----------------------------------------------------------
+      chrome.storage.local.get([currentVideo+"playbackRate"], (data) => {
+        let rate = data[currentVideo+"playbackRate"];
+        if (rate == undefined) {
+          rate = 1;
+        }
+        document.getElementById('tempo-value').value = rate;
+        document.getElementById('tempo').value = rate;
+        chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+          chrome.tabs.sendMessage(tabs[0].id, {action: "changePlaybackRate", rate: rate, videoID: currentVideo});
+        });
+      });
       chrome.storage.local.get([currentVideo+"markers"], (data) => {
-        const currentVideoMarkers = data[currentVideo] ? JSON.parse(data[currentVideo]) : [];
+        const currentVideoMarkers = data[currentVideo+"markers"] ? JSON.parse(data[currentVideo+"markers"]) : [];
         viewMarkers(currentVideoMarkers);
       });
       chrome.storage.local.get([currentVideo+"flip"], (data) => {
@@ -71,6 +143,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         document.getElementById('mirror').checked = flipState;
       });
       
+      //BUTTON HANDLING ----------------------------------------------------------
       document.getElementById('mirror').addEventListener('change', function() {
         chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
           chrome.tabs.sendMessage(tabs[0].id, {action: "flipVideo", videoID: currentVideo});
@@ -96,16 +169,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
       });
 
-      chrome.storage.local.get([currentVideo+"rate"], (data) => {
-        let rate = data[currentVideo+"rate"];
-        if (rate == undefined) {
-          rate = 1;
+      document.getElementById("clear-segments").addEventListener("click", async (e) => {
+        if(e.target.id != "clear-segments"){
+          return;
         }
-        document.getElementById('tempo-value').value = rate;
-        document.getElementById('tempo').value = rate;
-        chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-          chrome.tabs.sendMessage(tabs[0].id, {action: "changePlaybackRate", rate: rate, videoID: currentVideo});
-        });
+        clearHighlights('marker-control:begin');
+        clearHighlights('marker-control:end'); 
+        const activeTab = await getActiveTabURL();
+        chrome.tabs.sendMessage(activeTab.id, {
+          action: "clearMarkers",
+        }); 
       });
     } else {
       const container = document.getElementsByClassName("wrapper")[0];

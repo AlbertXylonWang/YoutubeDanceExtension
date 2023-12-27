@@ -22,7 +22,10 @@
 
       "resources" : [
         "assets/marker.png",
-        "assets/icons8-crayon-48.png"
+        "assets/icons8-crayon-48.png",
+        "assets/begin.png",
+        "assets/end.png",
+        "assets/delete.png"
       ],
       "matches": ["https://*.youtube.com/*"]
       }

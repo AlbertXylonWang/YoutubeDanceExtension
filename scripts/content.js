@@ -13,7 +13,6 @@
   function flipVideo() {
     const video = document.querySelector('video');
     if (video) {
-       console.log("currentVideo: "+currentVideo);
         const newState = !flipState;
         flipState = newState;
         applyFlip(video);
@@ -61,14 +60,13 @@ const observerConfig = {
 function startObserver() {
   const video = document.querySelector('video');
   if (video) {
-      console.log("observer started");
       observer.observe(document.body, observerConfig);
       applyFlip(video);
   }
 }
 
 function stopObserver() {
-  console.log("observer stopped");
+  if(!observer) return;
   observer.disconnect();
 }
 
@@ -103,7 +101,11 @@ function changePlaybackRate(rate){
 // Markers ----------------------------------------------------------------------
 
 const addNewMarkerEventHandler = async () => {
-  console.log('BUTTON DETECTED');
+  currentVideoMarkers = await fetchMarkers();
+  if(currentVideoMarkers.length >= 5){
+    alert("You can only have 6 markers per video");
+    return;
+  }
     const currentTime = youtubePlayer.currentTime;
     const newMarker = {
       time: currentTime,
@@ -117,21 +119,28 @@ const addNewMarkerEventHandler = async () => {
   };
 
 
-  const fetchMarkers = async () => {
-    const markers = await chrome.storage.local.get(currentVideo+"markers");
-    return JSON.parse(markers[currentVideo+"markers"]);
+  const fetchMarkers = () => {
+    return new Promise((resolve) => {
+      chrome.storage.local.get([currentVideo+"markers"], (obj) => {
+        resolve(obj[currentVideo+"markers"] ? JSON.parse(obj[currentVideo+"markers"]) : []);
+      });
+    });
   };
   
 // LOOP SEGMENT ----------------------------------------------------------------
 
 function checkLoop(){
   if(markerStart != 0 && markerEnd != 0){
-    console.log("start: "+markerStart+"\nend: "+markerEnd);
     clearInterval(intervalId);
     intervalId = setInterval(loop, 1000);
   }
 }
 function loop(){
+  if(markerEnd > youtubePlayer.duration){
+    clearInterval(intervalId);
+    markerStart = 0;
+    markerEnd = 0;
+  }
   if(youtubePlayer.currentTime >= markerEnd || youtubePlayer.currentTime < markerStart){
     youtubePlayer.currentTime = markerStart;
   }
@@ -140,15 +149,15 @@ function loop(){
 
 // ON LOAD----------------------------------------------------------------------
 const newVideoLoaded = async () => {
-    
+    markerStart = 0;
+    markerEnd = 0
     const markerBtnExists = document.getElementsByClassName("ytp-button marker-btn")[0];
     currentVideoMarkers = await fetchMarkers();
     flipState = await fetchFlipState();
     playbackR = await fetchPlaybackRate();
-    console.log("new video loaded running\nflipState: "+flipState+"\nplaybackRate: "+playbackR+"\n")
     applyFlip(document.querySelector('video'));
-
-    console.log('stored properties applied');
+    changePlaybackRate(playbackR);
+    
     if (!markerBtnExists) {
       const markerBtn = document.createElement("img");
 
@@ -177,12 +186,12 @@ chrome.runtime.onMessage.addListener(
         newVideoLoaded();
         startObserver();
       }
-      console.log("message received: " + request.action);
         if (request.action === "flipVideo") {
             flipVideo();
         }else if(request.action === "changePlaybackRate"){
           changePlaybackRate(request.rate);
         }else if(request.action === "deleteMarker"){
+      
           currentVideoMarkers = currentVideoMarkers.filter((b) => b.time != request.time);
           chrome.storage.local.set({ [currentVideo+"markers"]: JSON.stringify(currentVideoMarkers) });
           response(currentVideoMarkers)
@@ -192,6 +201,10 @@ chrome.runtime.onMessage.addListener(
         }else if(request.action === "setMarkerEnd"){
           markerEnd = request.time;
           checkLoop();
+        }else if(request.action === "clearMarkers"){
+          markerStart = 0;
+          markerEnd = 0;
+          clearInterval(intervalId);
         }
     }
 );
@@ -201,9 +214,13 @@ window.addEventListener('beforeunload', () => {
     if (intervalId) {
         clearInterval(intervalId);
     }
-    console.log("page unloaded");
+    
     stopObserver();
 });
+
+
+
+
 })();
 
 const getTime = t => {
