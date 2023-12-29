@@ -2,7 +2,7 @@
     "manifest_version": 3,
     "name": "Dance Practice Assist for Youtube",
     "description": "Video Mirroring, Speed Control, and Segment looping to help you learn dance choreographies!",
-    "version": "1.0",
+    "version": "1.1",
     "action": {
       "default_popup": "scripts/popup.html",
       "default_icon": {

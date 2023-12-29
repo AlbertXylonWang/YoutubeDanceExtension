@@ -1,12 +1,14 @@
 (() => {
   let youtubeRightControls, youtubePlayer;
-  var flipState;
-  var currentVideo = "";
+  let flipState;
+  let currentVideo = "";
   let currentVideoMarkers = [];
   let markerStart = 0;
   let markerEnd = 0;
   let intervalId;
-  var playbackR = 1;
+  let playbackR = 1;
+  let currentSrc = "";
+
 
 
   // FLIP VIDEO ----------------------------------------------------------------------
@@ -22,9 +24,9 @@
     }
 }
 function applyFlip(video){
-
+  if(video == undefined) return;
   video.style.transform = flipState ? 'scaleX(-1)' : 'scaleX(1)';
-
+  
 }
 const fetchFlipState = () => {
   return new Promise((resolve, reject) => {
@@ -38,11 +40,19 @@ const fetchFlipState = () => {
   });
 };
 
-
+const clearFlipState = (video) => {
+  video.style.transform = 'scaleX(1)';
+}
 const observer = new MutationObserver(mutations => {
   
   mutations.forEach(mutation => {
-      if (mutation.target.tagName === 'VIDEO') {
+    
+    if(mutation.target.src != undefined && mutation.target.src != currentSrc){
+      clearFlipState(mutation.target);
+      flipState = false;
+      stopObserver();
+      currentVideo = "";
+    }else if (mutation.type === 'attributes' && mutation.attributeName === 'style' ) {
           applyFlip(mutation.target);
       }
   });
@@ -60,8 +70,10 @@ const observerConfig = {
 function startObserver() {
   const video = document.querySelector('video');
   if (video) {
-      observer.observe(document.body, observerConfig);
-      applyFlip(video);
+      observer.observe(document.getElementsByClassName("video-stream")[0], observerConfig);
+      if(video.src != ""){
+        currentSrc = video.src;
+      }
   }
 }
 
@@ -101,6 +113,10 @@ function changePlaybackRate(rate){
 // Markers ----------------------------------------------------------------------
 
 const addNewMarkerEventHandler = async () => {
+  if(currentVideo == ""){
+    alert("Please click the extension icon again");
+    return;
+  }
   currentVideoMarkers = await fetchMarkers();
   if(currentVideoMarkers.length >= 5){
     alert("You can only have 6 markers per video");
@@ -168,6 +184,7 @@ const newVideoLoaded = async () => {
     markerStart = 0;
     markerEnd = 0
     const markerBtnExists = document.getElementsByClassName("ytp-button marker-btn")[0];
+    
     currentVideoMarkers = await fetchMarkers();
     flipState = await fetchFlipState();
     playbackR = await fetchPlaybackRate();
