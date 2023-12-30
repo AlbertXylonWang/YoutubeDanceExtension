@@ -204,7 +204,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       button.title = "Clears the selections made for the start and end of the loop";
       //END OF BUTTON HANDLING ----------------------------------------------------------
       chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-        chrome.tabs.sendMessage(tabs[0].id, {action: "", videoID: currentVideo});
+        chrome.tabs.sendMessage(tabs[0].id, {action: "check", videoID: currentVideo});
       });
     } else {
       const container = document.getElementsByClassName("wrapper")[0];

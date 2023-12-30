@@ -117,7 +117,7 @@ function changePlaybackRate(rate){
 
 const addNewMarkerEventHandler = async () => {
   if(currentVideo == ""){
-    alert("Please click the extension icon again");
+    alert("Current Video not found:\nPlease click the extension icon again or refresh the page");
     return;
   }
   currentVideoMarkers = await fetchMarkers();
