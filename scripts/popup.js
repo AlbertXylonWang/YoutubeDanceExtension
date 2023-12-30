@@ -188,7 +188,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
       });
 
-      document.getElementById("clear-segments").addEventListener("click", async (e) => {
+      let button = document.getElementById('clear-segments');
+
+      button.addEventListener("click", async (e) => {
         if(e.target.id != "clear-segments"){
           return;
         }
@@ -198,6 +200,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         chrome.tabs.sendMessage(activeTab.id, {
           action: "clearMarkers",
         }); 
+      });
+      button.title = "Clears the selections made for the start and end of the loop";
+      //END OF BUTTON HANDLING ----------------------------------------------------------
+      chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+        chrome.tabs.sendMessage(tabs[0].id, {action: "", videoID: currentVideo});
       });
     } else {
       const container = document.getElementsByClassName("wrapper")[0];

@@ -49,6 +49,9 @@ const observer = new MutationObserver(mutations => {
     
     if(mutation.target.src != undefined && mutation.target.src != currentSrc){
       clearFlipState(mutation.target);
+      clearInterval(intervalId);
+      clearMarkerEnd();
+      clearMarkerStart();
       flipState = false;
       stopObserver();
       currentVideo = "";
@@ -158,11 +161,18 @@ const addNewMarkerEventHandler = async () => {
       );
     });
   };
-
+  function clearMarkerStart(){
+    markerStart = -1;
+    chrome.storage.local.remove([currentVideo+"markerStart"]);
+  }
+  function clearMarkerEnd(){
+    markerEnd = -1;
+    chrome.storage.local.remove([currentVideo+"markerEnd"]);
+  }
 // LOOP SEGMENT ----------------------------------------------------------------
 
 function checkLoop(){
-  if(markerStart != 0 && markerEnd != 0){
+  if(markerStart != -1 && markerEnd != -1){
     clearInterval(intervalId);
     intervalId = setInterval(loop, 1000);
   }
@@ -170,10 +180,10 @@ function checkLoop(){
 function loop(){
   if(markerEnd > youtubePlayer.duration){
     clearInterval(intervalId);
-    markerStart = 0;
-    markerEnd = 0;
+    clearMarkerEnd();
+    clearMarkerStart();
   }
-  if(youtubePlayer.currentTime >= markerEnd || youtubePlayer.currentTime < markerStart){
+  if( (youtubePlayer.currentTime >= markerEnd && markerEnd != -1 )|| youtubePlayer.currentTime < markerStart){
     youtubePlayer.currentTime = markerStart;
   }
 
@@ -181,8 +191,8 @@ function loop(){
 
 // ON LOAD----------------------------------------------------------------------
 const newVideoLoaded = async () => {
-    markerStart = 0;
-    markerEnd = 0
+    clearMarkerEnd();
+    clearMarkerStart();
     const markerBtnExists = document.getElementsByClassName("ytp-button marker-btn")[0];
     
     currentVideoMarkers = await fetchMarkers();
@@ -199,7 +209,20 @@ const newVideoLoaded = async () => {
       markerBtn.src = chrome.runtime.getURL("assets/icons8-crayon-48.png");
       markerBtn.className = "ytp-button " + "marker-btn";
       markerBtn.title = "Click to mark the current timestamp";
-
+      markerBtn.onmouseover = function () {
+        markerBtn.style.opacity = "0.5";
+      };
+      markerBtn.onmouseout = function () {
+        markerBtn.style.opacity = "1";
+      };
+      markerBtn.style.opacity = "1";
+      markerBtn.style.cursor = "pointer";
+      markerBtn.onmousedown = function () {
+        markerBtn.style.scale = "0.8";
+      };
+      markerBtn.onmouseup = function () {
+        markerBtn.style.scale = "1";
+      };
       youtubeRightControls = document.getElementsByClassName("ytp-right-controls")[0];
       youtubePlayer = document.getElementsByClassName('video-stream')[0];
 
@@ -228,6 +251,12 @@ chrome.runtime.onMessage.addListener(
         }else if(request.action === "deleteMarker"){
       
           currentVideoMarkers = currentVideoMarkers.filter((b) => b.time != request.time);
+          if(markerStart != undefined && markerStart == request.time){
+            clearMarkerStart();
+          }
+          if(markerEnd != undefined && markerEnd == request.time){
+            clearMarkerEnd();
+          }
           chrome.storage.local.set({ [currentVideo+"markers"]: JSON.stringify(currentVideoMarkers) });
           response(currentVideoMarkers)
         }else if(request.action === "setMarkerStart"){
