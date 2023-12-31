@@ -126,6 +126,9 @@ const addNewMarkerEventHandler = async () => {
     return;
   }
     const currentTime = youtubePlayer.currentTime;
+    if(currentVideoMarkers.some((b) => b.time == currentTime)){//marker already exists at this time stamp
+      return;
+    }
     const newMarker = {
       time: currentTime,
       desc: "Marker at " + getTime(currentTime),
