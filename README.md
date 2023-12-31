@@ -13,12 +13,15 @@ This extension can be found on the chrome extension store or by downloading the 
 ![extension screenshot](https://github.com/AlbertXylonWang/YoutubeDanceExtension/assets/89566740/7b430c81-9091-4a31-8282-fb8841176b6f)
 
 # Feature Descriptions
-## Mirroring
+### Mirroring
+
 Mirroring will transform the player horizontally.
-## Speed Control
+
+### Speed Control
+
 Speed Control will set the playback rate of the youtube video player.
 
-## Segmentation and Looping
+### Segmentation and Looping
 This is the most complex feature here. What this does is it inserts a button into the youtube player that allows the user to create markers at specific time stamps. These markers then appear on the extension popup with the ability to set them as starting and end points. After these points are set the extension checks on a 1 second time interval if the youtube player current time is beyond the interval.
 
 These features are saved locally per video and can be restored when reloading the page.
